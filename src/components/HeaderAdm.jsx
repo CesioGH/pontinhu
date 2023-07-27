@@ -26,7 +26,7 @@ const HeaderUsuario = () => {
   return (
     <header>
       <Link href="/">
-        <img src="/link_to_your_logo.png" alt="Logo do Aplicativo" />
+        <h1>Logo</h1>
       </Link>
       {currentUser ? (
         <div>

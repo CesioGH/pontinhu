@@ -29,9 +29,7 @@ const LoginPage = () => {
         <input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} required />
         <button type="submit">Login</button>
         <br />
-        <p>resumospontinho@proton.me</p>
-        <br />
-        <p>nakamura1616</p>
+       
         
       </form>
       {error && <p>{error}</p>} {/* Mostrar a mensagem de erro se houver algum */}

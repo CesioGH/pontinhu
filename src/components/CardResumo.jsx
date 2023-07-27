@@ -6,7 +6,7 @@ import { db } from '../../src/lib/firebase'
 
 import firebase from 'firebase/compat/app';
 
-export default function CardResumo ({ resumo }) {
+export default function CardResumo ({ resumo, isDescriptionOpen, onToggleDescription }) {
   const [step, setStep] = useState(0);
   const { currentUser } = useAuth();
   const [orderId, setOrderId] = useState(null);
@@ -68,20 +68,23 @@ export default function CardResumo ({ resumo }) {
 
   const isBought = boughtResumes.includes(resumo.nome);
 
-  return (
+   return (
     <div className={styles.card} style={isBought ? { backgroundColor: 'green' } : null}>
       <img className={styles.thumbnail} src={resumo.thumbnail} alt={resumo.nome} />
 
       <>
-        <h2>{resumo.nome}</h2>
-        <h2>{resumo.assunto}</h2>
+        <h3>{resumo.nome}</h3>
+        <h3>{resumo.assunto}</h3>
 
         <div style={{display:"flex", gap:"5px"}}>
-          <h2>{resumo.valor}</h2>
-          {isBought ? <h3>Comprado</h3> : <button onClick={handleClick}>Comprar</button>}
+          <h3>R${resumo.valor}</h3>
+          {isBought ? <h3 style={{color:"white"}}>Comprado</h3> : <button onClick={handleClick}>Comprar</button>}
         </div>
 
-        <p>{resumo.descricao}</p>
+        <div onClick={onToggleDescription} className={styles['dropdown-container']}>
+          <p>Ver Descrição</p>
+          {isDescriptionOpen && <div className={`${styles.dropdown} ${isDescriptionOpen ? styles['dropdown-open'] : ''}`}>{resumo.descricao}</div>}
+        </div>
       </>
     </div>
   );

@@ -1,15 +1,16 @@
-import { useEffect ,useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '../src/contexts/AuthContext'
 import { db, storage } from '../src/lib/firebase'
 import ResumosComApagar from '../src/components/ResumosComApagar';
 import { v4 as uuidv4 } from 'uuid';
 import HeaderAdm from "../src/components/HeaderAdm"
+import { doc, getDoc, getFirestore } from "firebase/firestore";
 
 const ResumosPage = () => {
   const { currentUser } = useAuth();
   const router = useRouter();
-  
+
   const [resumos, setResumos] = useState([]);
 
   useEffect(() => {
@@ -20,11 +21,11 @@ const ResumosPage = () => {
       }));
       setResumos(resumosData);
     });
-  
+
     // cleanup function
     return () => fetchResumos();
   }, []);
-  
+
 
   const [nome, setNome] = useState("");
   const [assunto, setAssunto] = useState("");
@@ -38,12 +39,21 @@ const ResumosPage = () => {
     return null; // Return null to indicate that no component should be rendered
   }
 
+  const sanitizeId = (id) => {
+    return id
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/ç/g, "c")
+      .replace(/ /g, "-")
+      .toLowerCase();
+  };
+
   const uploadFileToFirebase = async (file) => {
     if (file === null) {
-      return null; // Retorna null se não há arquivo
+      return null;
     }
     const storageRef = storage.ref();
-    const uniqueName = uuidv4() + '-' + file.name; // Gera um nome de arquivo único
+    const uniqueName = uuidv4() + '-' + file.name;
     const fileRef = storageRef.child(uniqueName);
     await fileRef.put(file);
     return await fileRef.getDownloadURL();
@@ -51,10 +61,21 @@ const ResumosPage = () => {
 
   const handleResumoSubmit = async (event) => {
     event.preventDefault();
-    
+
+    const resumoId = sanitizeId(nome);
+
+    // Verificando se já existe um resumo com o mesmo nome
+    const existingResumoDoc = doc(db, "resumos", resumoId);
+    const existingResumoSnapshot = await getDoc(existingResumoDoc);
+
+    if (existingResumoSnapshot.exists()) {
+        alert('Já existe um resumo com esse nome. Por favor, escolha outro nome.');
+        return;
+    }
+
     const thumbnailUrl = await uploadFileToFirebase(thumbnail);
     const pdfUrl = await uploadFileToFirebase(pdf);
-  
+
     const resumoData = {
       nome,
       assunto,
@@ -63,26 +84,23 @@ const ResumosPage = () => {
       thumbnail: thumbnailUrl,
       pdf: pdfUrl,
     };
-  
-    await db.collection('resumos').add(resumoData);
-  
-    // Limpando todos os campos do formulário
+
+    await db.collection('resumos').doc(resumoId).set(resumoData);
+
     setNome("");
     setAssunto("");
-    setValor(""); //ou setValor(0) dependendo do que faz mais sentido no seu caso
+    setValor("");
     setDescricao("");
     setThumbnail("");
     setPdf("");
-  };
-  
+};
+
 
   return (
-
     <div>
-    <HeaderAdm/>
-    
+      <HeaderAdm />
 
-    <h1>Cadastro dos resumos:</h1>
+      <h1>Cadastro dos resumos:</h1>
 
       <form onSubmit={handleResumoSubmit}>
         <label>
@@ -118,24 +136,14 @@ const ResumosPage = () => {
         <button type="submit">Submit</button>
       </form>
 
-    <br /><br />
+      <br /><br />
 
-    <div style={{}}>
+      <div style={{}}>
         {resumos.map((resumo, index) => (
-          <ResumosComApagar key={resumo.id} resumo={resumo} index={index}/>
-          
+          <ResumosComApagar key={resumo.id} resumo={resumo} index={index} />
         ))}
       </div>
-
-
-
-
-
-
     </div>
-
-   
-
   );
 };
 
