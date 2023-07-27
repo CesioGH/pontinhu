@@ -11,7 +11,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyA5dgphkznom5xpTLAPOiJAUclUim4ozd0",
   authDomain: "pontinhosc-39cf0.firebaseapp.com",
   projectId: "pontinhosc-39cf0",
-  storageBucket: "pontinhosc-39cf0.appspot.com",
+  storageBucket: "pontinhosc-39cf0.appspot.com", 
   messagingSenderId: "960544111866",
   appId: "1:960544111866:web:8597018369d4ec200e1d43"
 };
@@ -24,7 +24,7 @@ export default async (req, res) => {
   if (req.method === 'POST') {
     const { title, unitPrice, email, external_reference } = req.body;
 
-    // Configuração da preferência do Mercado Pago
+    
     const preference = {
       items: [
         {
@@ -37,15 +37,14 @@ export default async (req, res) => {
         email: email,
       },
       external_reference: external_reference,
-      payment_methods: { // Definindo métodos de pagamento
+      payment_methods: { 
         excluded_payment_types: [
           { id: 'ticket' },
           { id: 'atm' },
           { id: 'credit_card' },
           { id: 'debit_card' },
-          // Adicione todos os outros métodos que você deseja excluir aqui
-        ],
-        installments: 1, // Número máximo de parcelas permitidas
+        ]
+       
       },
       back_urls: { // Definindo a URL de retorno
         success: 'https://pontinhu-2.vercel.app/Geral', // A URL do seu site onde você deseja que os usuários voltem
@@ -57,10 +56,10 @@ export default async (req, res) => {
     
 
     try {
-      // Criar a preferência no Mercado Pago
+     
       const payment = await mercadopago.preferences.create(preference);
 
-      // Configuração da compra
+      
       const compra = {
         resumoNome: title,
         emailComprador: email,

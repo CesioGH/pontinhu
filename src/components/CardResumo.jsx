@@ -76,8 +76,8 @@ export default function CardResumo ({ resumo, isDescriptionOpen, onToggleDescrip
         <h3>{resumo.nome}</h3>
         <h3>{resumo.assunto}</h3>
 
-        <div style={{display:"flex", gap:"5px"}}>
-          <h3>R${resumo.valor}</h3>
+        <div style={{display:"flex", gap:"3px"}}>
+          <p>R${resumo.valor}</p>
           {isBought ? <h3 style={{color:"white"}}>Comprado</h3> : <button onClick={handleClick}>Comprar</button>}
         </div>
 
