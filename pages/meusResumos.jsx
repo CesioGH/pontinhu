@@ -5,10 +5,14 @@ import { useUserAuth } from '../src/contexts/UserAuthContext';
 import HeaderUsuario from "/src/components/HeaderUsuario";
 import { UserAuthProvider } from '../src/contexts/UserAuthContext';
 import { useRouter } from 'next/router';
+import styles from '../styles/MeusResumos.module.css';
 
 const MeusResumos = () => {
   const { currentUser } = useUserAuth();
   const [boughtResumes, setBoughtResumes] = useState([]);
+  const [pdfSrc, setPdfSrc] = useState(null);
+  const [openDescriptionIndex, setOpenDescriptionIndex] = useState(null);
+  const [activeResume, setActiveResume] = useState(null);
   const router = useRouter();
 
   const sanitizeId = (id) => {
@@ -22,7 +26,7 @@ const MeusResumos = () => {
 
   useEffect(() => {
     if (!currentUser) {
-      router.push('/Geral'); // redirect the user to homepage if not logged in
+      router.push('/Geral');
     } else {
       const userRef = doc(db, "usuarios", currentUser.email);
       const unsubscribe = onSnapshot(userRef, async (userDoc) => {
@@ -34,33 +38,71 @@ const MeusResumos = () => {
         }
       });
 
-      // Return a cleanup function that unsubscribes the listener when the component is unmounted
       return () => unsubscribe();
     }
   }, [currentUser]);
+
+  const toggleDescription = (index) => {
+    if (index === openDescriptionIndex) {
+      setOpenDescriptionIndex(null);
+    } else {
+      setOpenDescriptionIndex(index);
+    }
+  };
 
   return (
     <UserAuthProvider>
       <div>
         <HeaderUsuario/>
         <h1>Meus Resumos</h1>
-        <div style={{display:"flex",flexDirection:"column",gap:"10px"}}>
-          {boughtResumes.map((resumo, index) => {
-            return resumo ? (
-              <div style={{borderStyle:"solid", display:"flex",flexDirection:"column",gap:"10px", justifyContent:"center", alignItems:"center" }} key={index}>
-                <img style={{width:"150px"}} src={resumo.thumbnail} alt="thumbnail" />
-                <h2>{resumo.nome}</h2>
-                <h3>{resumo.assunto}</h3>
-                <p>{resumo.descricao}</p>
-                <a href={resumo.pdf}>Ver PDF</a>
+        <div style={{display:"flex", flexWrap:"wrap", gap:"5px", justifyContent:"center",alignItems:"center" }}>
+          <div style={{display:"flex",flexDirection:"row",gap:"10px", flexWrap:"wrap"}}>
+          {activeResume ? (
+            <div className={styles.cardMeuResumo}>
+              <img style={{width: '100%', height: 'auto', objectFit: 'cover'}} src={activeResume.thumbnail} alt="thumbnail" />
+              <h2>{activeResume.nome}</h2>
+              <h3>{activeResume.assunto}</h3>
+              <div className={styles['dropdown-container']} onClick={() => toggleDescription(activeResume)}>
+                <div className={`${styles.dropdown} ${openDescriptionIndex === activeResume ? styles['dropdown-show'] : ''}`}>{activeResume.descricao}</div>
+                <p>Descrição</p>
+                <button onClick={() => {
+                  setPdfSrc(activeResume.pdf);
+                  setActiveResume(null);
+                }}>Ver PDF</button>
               </div>
-            ) : (
-              <div key={index}>
-                <p>Carregando...</p>
-              </div>
-            );
-          })}
-        </div>
+            </div>
+          ) : (
+            boughtResumes.map((resumo, index) => {
+              return resumo ? (
+                <div className={styles.cardMeuResumo} key={index}>
+                  <img style={{width: '100%', height: 'auto', objectFit: 'cover'}} src={resumo.thumbnail} alt="thumbnail" />
+                  <h2>{resumo.nome}</h2>
+                      <h3>{resumo.assunto}</h3>
+                      <div className={styles['dropdown-container']} onClick={() => toggleDescription(index)}>
+                        <div className={`${styles.dropdown} ${openDescriptionIndex === index ? styles['dropdown-show'] : ''}`}>{resumo.descricao}</div>
+                        <p>Descrição</p>
+                        <button onClick={() => {
+                          setPdfSrc(resumo.pdf);
+                          setActiveResume(resumo);
+                        }}>Ver PDF</button>
+                      </div>
+                    </div>
+              ) : (
+                <div key={index}>
+                  <p>Carregando...</p>
+                </div>
+              );
+            })
+          )}
+          </div>
+          {activeResume && <button style={{flex:"0 0 auto", width:"15vw", padding:"2px" }} onClick={() => setActiveResume(null)}>Ver meus outros resumos</button>}
+            </div>
+            <br />
+            {pdfSrc && (
+            <div style={{width: '100%', height: '100vh'}}>
+              <iframe src={pdfSrc} width="100%" height="100%" style={{border: 'none'}}></iframe>
+            </div>
+        )}
       </div>
     </UserAuthProvider>
   )
