@@ -14,7 +14,11 @@ const MeusResumos = () => {
   const [openDescriptionIndex, setOpenDescriptionIndex] = useState(null);
   const [activeResume, setActiveResume] = useState(null);
   const router = useRouter();
+  const [searchTerm, setSearchTerm] = useState("");
 
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);
+  };
   const sanitizeId = (id) => {
     return id
       .normalize("NFD")
@@ -53,30 +57,47 @@ const MeusResumos = () => {
   return (
     <UserAuthProvider>
       <div>
-        <HeaderUsuario/>
+        <HeaderUsuario />
         <h1>Meus Resumos</h1>
-        <div style={{display:"flex", flexWrap:"wrap", gap:"5px", justifyContent:"center",alignItems:"center" }}>
-          <div style={{display:"flex",flexDirection:"row",gap:"10px", flexWrap:"wrap"}}>
-          {activeResume ? (
-            <div className={styles.cardMeuResumo}>
-              <img style={{width: '100%', height: 'auto', objectFit: 'cover'}} src={activeResume.thumbnail} alt="thumbnail" />
-              <h2>{activeResume.nome}</h2>
-              <h3>{activeResume.assunto}</h3>
-              <div className={styles['dropdown-container']} onClick={() => toggleDescription(activeResume)}>
-                <div className={`${styles.dropdown} ${openDescriptionIndex === activeResume ? styles['dropdown-show'] : ''}`}>{activeResume.descricao}</div>
-                <p>Descrição</p>
-                <button onClick={() => {
-                  setPdfSrc(activeResume.pdf);
-                  setActiveResume(null);
-                }}>Ver PDF</button>
+        <input
+          type="text"
+          placeholder="Pesquisar resumos"
+          onChange={handleSearchChange}
+        />
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", justifyContent: "center", alignItems: "center" }}>
+          <div style={{ display: "flex", flexDirection: "row", gap: "10px", flexWrap: "wrap" }}>
+            {activeResume ? (
+              <div className={styles.cardMeuResumo}>
+                <img style={{ width: '100%', height: 'auto', objectFit: 'cover' }} src={activeResume.thumbnail} alt="thumbnail" />
+                <h2>{activeResume.nome}</h2>
+                <h3>{activeResume.assunto}</h3>
+                <div className={styles['dropdown-container']} onClick={() => toggleDescription(activeResume)}>
+                  <div className={`${styles.dropdown} ${openDescriptionIndex === activeResume ? styles['dropdown-show'] : ''}`}>{activeResume.descricao}</div>
+                  <p>Descrição</p>
+                  <button onClick={() => {
+                    setPdfSrc(activeResume.pdf);
+                    setActiveResume(null);
+                  }}>Ver PDF</button>
+                </div>
               </div>
-            </div>
-          ) : (
-            boughtResumes.map((resumo, index) => {
-              return resumo ? (
-                <div className={styles.cardMeuResumo} key={index}>
-                  <img style={{width: '100%', height: 'auto', objectFit: 'cover'}} src={resumo.thumbnail} alt="thumbnail" />
-                  <h2>{resumo.nome}</h2>
+            ) : (
+              boughtResumes
+                .filter((resumo) => {
+                  if (resumo) {
+                    const name = resumo.nome.toLowerCase();
+                    const subject = resumo.assunto.toLowerCase();
+                    const description = resumo.descricao.toLowerCase();
+                    const term = searchTerm.toLowerCase();
+  
+                    return name.includes(term) || subject.includes(term) || description.includes(term);
+                  }
+                  return false;
+                })
+                .map((resumo, index) => {
+                  return resumo ? (
+                    <div className={styles.cardMeuResumo} key={index}>
+                      <img style={{ width: '100%', height: 'auto', objectFit: 'cover' }} src={resumo.thumbnail} alt="thumbnail" />
+                      <h2>{resumo.nome}</h2>
                       <h3>{resumo.assunto}</h3>
                       <div className={styles['dropdown-container']} onClick={() => toggleDescription(index)}>
                         <div className={`${styles.dropdown} ${openDescriptionIndex === index ? styles['dropdown-show'] : ''}`}>{resumo.descricao}</div>
@@ -87,25 +108,26 @@ const MeusResumos = () => {
                         }}>Ver PDF</button>
                       </div>
                     </div>
-              ) : (
-                <div key={index}>
-                  <p>Carregando...</p>
-                </div>
-              );
-            })
-          )}
+                  ) : (
+                    <div key={index}>
+                      <p>Carregando...</p>
+                    </div>
+                  );
+                })
+            )}
           </div>
-          {activeResume && <button style={{flex:"0 0 auto", width:"15vw", padding:"2px" }} onClick={() => setActiveResume(null)}>Ver meus outros resumos</button>}
-            </div>
-            <br />
-            {pdfSrc && (
-            <div style={{width: '100%', height: '100vh'}}>
-              <iframe src={pdfSrc} width="100%" height="100%" style={{border: 'none'}}></iframe>
-            </div>
+          {activeResume && <button style={{ flex: "0 0 auto", width: "15vw", padding: "2px" }} onClick={() => setActiveResume(null)}>Ver meus outros resumos</button>}
+        </div>
+        <br />
+        {pdfSrc && (
+          <div style={{ width: '100%', height: '100vh' }}>
+            <iframe src={pdfSrc} width="100%" height="100%" style={{ border: 'none' }}></iframe>
+          </div>
         )}
       </div>
     </UserAuthProvider>
   )
+  
 }
 
 export default MeusResumos;

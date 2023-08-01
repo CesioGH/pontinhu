@@ -9,42 +9,55 @@ import Footer from "../../src/components/Footer";
 export default function Geral(){
     
     const [resumos, setResumos] = useState([]);
-    const [openedCard, setOpenedCard] = useState(null); // Adicionado para o dropdown
+    const [openedCard, setOpenedCard] = useState(null); 
+    const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    const fetchResumos = async () => {
-      const snapshot = await db.collection('resumos').get();
-      const resumos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setResumos(resumos);
-    };
- 
-    fetchResumos();
-  }, []);
+    useEffect(() => {
+        const fetchResumos = async () => {
+        const snapshot = await db.collection('resumos').get();
+        const resumos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setResumos(resumos);
+        };
 
-  // Função para lidar com o dropdown
-  const handleToggleDescription = (nome) => {
-    setOpenedCard(openedCard === nome ? null : nome);
-  }
+        fetchResumos();
+    }, []);
 
-  return(
-    <UserAuthProvider>
-      <div>
-        <HeaderUsuario/>
-        <div style={{display:"flex",flexDirection:"column",alignItems:"center"}}> 
-          <h1>Resumos</h1>
-          <div style={{display:"flex", flexWrap:"wrap", gap:"10px", justifyContent:"space-evenly"}}>
-            {resumos.map(resumo => (
-              <CardResumo 
-                key={resumo.id} 
-                resumo={resumo}
-                isDescriptionOpen={openedCard === resumo.nome} // Adicionado para o dropdown
-                onToggleDescription={() => handleToggleDescription(resumo.nome)} // Adicionado para o dropdown
-              />
-            ))}
-          </div>
-        </div>
-        <Footer/>
-      </div>
-    </UserAuthProvider>
-  )
+    const handleToggleDescription = (nome) => {
+        setOpenedCard(openedCard === nome ? null : nome);
+    }
+
+    return(
+        <UserAuthProvider>
+            <div>
+                <HeaderUsuario/>
+                <input
+                    type="text"
+                    placeholder="Pesquisar resumos..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                />
+                <div style={{display:"flex",flexDirection:"column",alignItems:"center", marginBottom:"15px"}}> 
+                    <h1>Resumos</h1>
+                    <div style={{display:"flex", flexWrap:"wrap", gap:"10px", justifyContent:"space-evenly"}}>
+                        {resumos
+                            .filter(resumo =>
+                            resumo.nome.toLowerCase().includes(search.toLowerCase()) ||
+                            resumo.assunto.toLowerCase().includes(search.toLowerCase()) ||
+                            resumo.descricao.toLowerCase().includes(search.toLowerCase())
+                            )
+                            .map(resumo => (
+                            <CardResumo 
+                                key={resumo.id} 
+                                resumo={resumo}
+                                isDescriptionOpen={openedCard === resumo.nome} 
+                                onToggleDescription={() => handleToggleDescription(resumo.nome)} 
+                            />
+                        ))}
+                    </div>
+                </div>
+                <br />
+                <Footer/>
+            </div>
+        </UserAuthProvider>
+    )
 }
