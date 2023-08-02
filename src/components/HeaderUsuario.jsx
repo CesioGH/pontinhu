@@ -4,77 +4,12 @@ import { useRouter } from 'next/router';
 import { useUserAuth } from '../../src/contexts/UserAuthContext';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signOut } from 'firebase/auth';
 import { auth } from "../lib/firebase";
-import styled from 'styled-components';
+import styles from '../../styles/HeaderUsuario.module.css';
+import { nfd } from 'unorm';
 
-const LogoImage = styled.img`
-  width: 70px;
-
-  @media (max-width: 600px) {
-    width: 50px;
-  }
-`;
-
-const SearchInput = styled.input`
-  // estilize sua input de acordo com sua necessidade
-  margin-left: 20px;
-  height: 20px;
-  padding: 2px;
-`;
-
-const UserButton = styled.button`
-  max-width: 200px;
-  white-space: wrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-
-  @media (max-width: 600px) {
-    max-width: 100px;
-    font-size: 0.8em;
-  }
-  @media (max-width: 425px) {
-    max-width: 80px;
-    font-size: 0.7em;
-  }
-  @media (max-width: 320px) {
-    max-width: 75px;
-    font-size: 0.65em;
-  }
-`;
-
-const UserImage = styled.img`
-  cursor: pointer;
-  width: 60px;
-  border-radius: 20%;
-  transition: transform 0.3s;
-
-  &:hover {
-    transform: scale(1.3);
-  }
-
-  @media (max-width: 600px) {
-    width: 40px;
-  }
-`;
-
-const HeaderContainer = styled.header`
-  position: fixed; 
-  top: 0; 
-  width: 99%; 
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #333;
-  
-  z-index: 100; // Adicione esta linha para garantir que o header esteja acima dos outros elementos da página.
-
-  @media (max-width: 600px) {
-    padding: 2px;
-  }
-
-  @media (max-width: 600px) {
-    padding: 2px;
-  }
-`;
+const sanitizeString = (str) => {
+  return nfd(str).replace(/[\u0300-\u036f]/g, "").toLowerCase();
+};
 
 const HeaderUsuario = ({search, setSearch }) => {
   const { currentUser } = useUserAuth();
@@ -145,45 +80,40 @@ const HeaderUsuario = ({search, setSearch }) => {
   };
 
   return (
-    <HeaderContainer>
+    <header className={styles.headerContainer}>
       <Link href="/Geral">
-        <LogoImage src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Some_trees.jpg/303px-Some_trees.jpg" alt="Logo do Aplicativo" />
+        <img className={styles.logoImage} src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Some_trees.jpg/303px-Some_trees.jpg" alt="Logo do Aplicativo" />
       </Link>
-      <SearchInput
-        type="text"
-        placeholder={getPlaceholderText()}
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+      <input className={styles.searchInput} type="text" placeholder={getPlaceholderText()} value={sanitizeString(search)} onChange={(e) => setSearch(sanitizeString(e.target.value))} />
       {currentUser ? (
-        <div style={{ position: 'relative' }}>
-          <div style={{ display: 'flex', alignItems:"center", gap:"5px" }}>
+        <div className={styles.userContainer}>
+          <div className={styles.userFlexContainer}>
             <Link href="/meusResumos">
-              <UserButton>Meus Resumos</UserButton>
+              <button className={styles.userButton}>Meus Resumos</button>
             </Link>
-            <div  style={{ display:"flex", flexDirection:"column",gap:"1px",alignItems:"center", paddingTop:"15px"  }}>
-              <UserImage onClick={toggleDropdown} src={currentUser.photoURL} alt="Foto do usuário" />
-              <p style={{color:"white"}}>{currentUser.displayName}</p>
+            <div className={styles.userImageContainer}>
+              <img className={styles.userImage} onClick={toggleDropdown} src={currentUser.photoURL} alt="Foto do usuário" />
+              <p className={styles.userName}>{currentUser.displayName}</p>
             </div>   
           </div>
           {dropdownOpen && (
-            <div style={{ position: 'absolute', right: "10%", top: '70%', backgroundColor: 'white', padding: '5px', boxShadow: '0px 2px 10px rgba(0,0,0,0.1)', borderRadius:"10px" }}>
-              <div style={{display:"flex", padding: '10px',flexDirection:"column", alignItems:"center", gap:"1px"}}>
+            <div className={styles.dropdown}>
+              <div className={styles.dropdownContent}>
                 <p>{currentUser.email}</p>
                 <Link href="/meusResumos">Meus Resumos</Link>
               </div>
-              <div style={{display:"flex", flexDirection:"column", alignItems:"center", gap:"5px"}}>
+              <div className={styles.dropdownButtons}>
                 <button onClick={handleSignOut}>Logout</button>
                 <button onClick={handleSwitchUser}>Trocar de Usuário</button>
               </div>
             </div>
           )}
         </div>
-      ) : (
-        <button onClick={handleSignIn}>Login com Google</button>
-      )}
-    </HeaderContainer>
+        ) : (
+          <button className={styles.loginButton} onClick={handleSignIn}>Login com Google</button>
+        )}
+    </header>
   );
 };
-
+  
 export default HeaderUsuario;
