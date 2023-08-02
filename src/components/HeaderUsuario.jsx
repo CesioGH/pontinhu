@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useUserAuth } from '../../src/contexts/UserAuthContext';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signOut } from 'firebase/auth';
 import { auth } from "../lib/firebase";
@@ -11,6 +12,13 @@ const LogoImage = styled.img`
   @media (max-width: 600px) {
     width: 50px;
   }
+`;
+
+const SearchInput = styled.input`
+  // estilize sua input de acordo com sua necessidade
+  margin-left: 20px;
+  height: 20px;
+  padding: 2px;
 `;
 
 const UserButton = styled.button`
@@ -49,11 +57,15 @@ const UserImage = styled.img`
 `;
 
 const HeaderContainer = styled.header`
+  position: fixed; 
+  top: 0; 
+  width: 99%; 
   display: flex;
   justify-content: space-between;
   align-items: center;
   background-color: #333;
-  padding: 5px;
+  
+  z-index: 100; // Adicione esta linha para garantir que o header esteja acima dos outros elementos da página.
 
   @media (max-width: 600px) {
     padding: 2px;
@@ -64,9 +76,10 @@ const HeaderContainer = styled.header`
   }
 `;
 
-const HeaderUsuario = () => {
+const HeaderUsuario = ({search, setSearch }) => {
   const { currentUser } = useUserAuth();
   const googleProvider = new GoogleAuthProvider();
+  const router = useRouter();
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -118,11 +131,30 @@ const HeaderUsuario = () => {
     setDropdownOpen(!dropdownOpen);
   };
 
+  
+
+  const getPlaceholderText = () => {
+    switch (router.pathname) {
+      case '/Geral':
+        return 'Pesquisar resumos...';
+      case '/meusResumos':
+        return 'Pesquisar meus resumos...';
+      default:
+        return '';
+    }
+  };
+
   return (
     <HeaderContainer>
       <Link href="/Geral">
         <LogoImage src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Some_trees.jpg/303px-Some_trees.jpg" alt="Logo do Aplicativo" />
       </Link>
+      <SearchInput
+        type="text"
+        placeholder={getPlaceholderText()}
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
       {currentUser ? (
         <div style={{ position: 'relative' }}>
           <div style={{ display: 'flex', alignItems:"center", gap:"5px" }}>

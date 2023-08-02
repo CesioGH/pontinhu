@@ -29,14 +29,10 @@ export default function Geral(){
     return(
         <UserAuthProvider>
             <div>
-                <HeaderUsuario/>
-                <input
-                    type="text"
-                    placeholder="Pesquisar resumos..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                />
-                <div style={{display:"flex",flexDirection:"column",alignItems:"center", marginBottom:"15px"}}> 
+            <HeaderUsuario search={search} setSearch={setSearch}/>
+
+                
+                <div style={{display:"flex",flexDirection:"column",alignItems:"center", marginBottom:"15px", marginTop:"120px"}}> 
                     <h1>Resumos</h1>
                     <div style={{display:"flex", flexWrap:"wrap", gap:"10px", justifyContent:"space-evenly"}}>
                         {resumos

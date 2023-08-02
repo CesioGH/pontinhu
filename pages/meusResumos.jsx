@@ -56,16 +56,23 @@ const MeusResumos = () => {
 
   return (
     <UserAuthProvider>
-      <div>
-        <HeaderUsuario />
+      <div style={{
+          marginTop:"130px",
+          display:"flex", 
+          flexDirection:"column",
+          alignItems:"center",
+          justifyContent:"center", 
+          backgroundColor:"green",
+          
+       
+       }
+       }>
+      <HeaderUsuario search={searchTerm} setSearch={setSearchTerm} />
+
         <h1>Meus Resumos</h1>
-        <input
-          type="text"
-          placeholder="Pesquisar resumos"
-          onChange={handleSearchChange}
-        />
+        
         <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", justifyContent: "center", alignItems: "center" }}>
-          <div style={{ display: "flex", flexDirection: "row", gap: "10px", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", flexDirection: "row", gap: "10px", flexWrap: "wrap", justifyContent:"space-evenly" }}>
             {activeResume ? (
               <div className={styles.cardMeuResumo}>
                 <img style={{ width: '100%', height: 'auto', objectFit: 'cover' }} src={activeResume.thumbnail} alt="thumbnail" />
@@ -95,7 +102,18 @@ const MeusResumos = () => {
                 })
                 .map((resumo, index) => {
                   return resumo ? (
-                    <div className={styles.cardMeuResumo} key={index}>
+                    <div style={{
+                      
+                      display:"flex", 
+                      flexDirection:"column",
+                      alignItems:"center",
+                      justifyContent:"center", 
+                      backgroundColor:"grey",
+                      
+                   
+                   }}
+
+                    className={styles.cardMeuResumo} key={index}>
                       <img style={{ width: '100%', height: 'auto', objectFit: 'cover' }} src={resumo.thumbnail} alt="thumbnail" />
                       <h2>{resumo.nome}</h2>
                       <h3>{resumo.assunto}</h3>
