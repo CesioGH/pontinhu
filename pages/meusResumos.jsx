@@ -56,17 +56,7 @@ const MeusResumos = () => {
 
   return (
     <UserAuthProvider>
-      <div style={{
-          marginTop:"130px",
-          display:"flex", 
-          flexDirection:"column",
-          alignItems:"center",
-          justifyContent:"center", 
-          backgroundColor:"green",
-          
-       
-       }
-       }>
+      <div className={styles.meusResumosContainer}>
       <HeaderUsuario search={searchTerm} setSearch={setSearchTerm} />
 
         <h1>Meus Resumos</h1>
@@ -75,9 +65,9 @@ const MeusResumos = () => {
           <div style={{ display: "flex", flexDirection: "row", gap: "10px", flexWrap: "wrap", justifyContent:"space-evenly" }}>
             {activeResume ? (
               <div className={styles.cardMeuResumo}>
-                <img style={{ width: '100%', height: 'auto', objectFit: 'cover' }} src={activeResume.thumbnail} alt="thumbnail" />
-                <h2>{activeResume.nome}</h2>
-                <h3>{activeResume.assunto}</h3>
+                <img className={styles.thumbFit} src={activeResume.thumbnail} alt="thumbnail" />
+                <p>{activeResume.nome}</p>
+                <p>{activeResume.assunto}</p>
                 <div className={styles['dropdown-container']} onClick={() => toggleDescription(activeResume)}>
                   <div className={`${styles.dropdown} ${openDescriptionIndex === activeResume ? styles['dropdown-show'] : ''}`}>{activeResume.descricao}</div>
                   <p>Descrição</p>
@@ -102,21 +92,10 @@ const MeusResumos = () => {
                 })
                 .map((resumo, index) => {
                   return resumo ? (
-                    <div style={{
-                      
-                      display:"flex", 
-                      flexDirection:"column",
-                      alignItems:"center",
-                      justifyContent:"center", 
-                      backgroundColor:"grey",
-                      
-                   
-                   }}
-
-                    className={styles.cardMeuResumo} key={index}>
-                      <img style={{ width: '100%', height: 'auto', objectFit: 'cover' }} src={resumo.thumbnail} alt="thumbnail" />
-                      <h2>{resumo.nome}</h2>
-                      <h3>{resumo.assunto}</h3>
+                    <div className={styles.cardMeuResumo}  key={index}>
+                      <img className={styles.thumbFit} src={resumo.thumbnail} alt="thumbnail" />
+                      <p>{resumo.nome}</p>
+                      <p>{resumo.assunto}</p>
                       <div className={styles['dropdown-container']} onClick={() => toggleDescription(index)}>
                         <div className={`${styles.dropdown} ${openDescriptionIndex === index ? styles['dropdown-show'] : ''}`}>{resumo.descricao}</div>
                         <p>Descrição</p>
@@ -134,7 +113,7 @@ const MeusResumos = () => {
                 })
             )}
           </div>
-          {activeResume && <button style={{ flex: "0 0 auto", width: "15vw", padding: "2px" }} onClick={() => setActiveResume(null)}>Ver meus outros resumos</button>}
+          {activeResume && <button className={styles.meusOutrosButton} onClick={() => setActiveResume(null)}>Ver meus outros resumos</button>}
         </div>
         <br />
         {pdfSrc && (

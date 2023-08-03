@@ -80,6 +80,8 @@ const HeaderUsuario = ({search, setSearch }) => {
   };
 
   return (
+    
+    
     <header className={styles.headerContainer}>
       <Link href="/Geral">
         <img className={styles.logoImage} src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Some_trees.jpg/303px-Some_trees.jpg" alt="Logo do Aplicativo" />
@@ -99,8 +101,8 @@ const HeaderUsuario = ({search, setSearch }) => {
           {dropdownOpen && (
             <div className={styles.dropdown}>
               <div className={styles.dropdownContent}>
-                <p>{currentUser.email}</p>
-                <Link href="/meusResumos">Meus Resumos</Link>
+                <p className={styles.email}>{currentUser.email}</p>
+                <Link className={styles.linkMeusResumos} href="/meusResumos">Meus Resumos</Link>
               </div>
               <div className={styles.dropdownButtons}>
                 <button onClick={handleSignOut}>Logout</button>
@@ -110,8 +112,9 @@ const HeaderUsuario = ({search, setSearch }) => {
           )}
         </div>
         ) : (
-          <button className={styles.loginButton} onClick={handleSignIn}>Login com Google</button>
+          <button className={styles.loginButton} onClick={handleSignIn}>Log in</button>
         )}
+        
     </header>
   );
 };

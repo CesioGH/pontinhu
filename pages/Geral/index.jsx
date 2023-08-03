@@ -1,10 +1,11 @@
 import CardResumo from "../../src/components/CardResumo"
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react'; 
 import { db } from '../../src/lib/firebase';
 import HeaderUsuario from "../../src/components/HeaderUsuario"
 import { UserAuthProvider } from '../../src/contexts/UserAuthContext';
 import Footer from "../../src/components/Footer";
+import styles from "../../styles/index.module.css"
 
 export default function Geral(){
     
@@ -31,8 +32,10 @@ export default function Geral(){
             <div>
             <HeaderUsuario search={search} setSearch={setSearch}/>
 
+            
+
                 
-                <div style={{display:"flex",flexDirection:"column",alignItems:"center", marginBottom:"15px", marginTop:"120px"}}> 
+                <div className={styles.bodyContainer} > 
                     <h1>Resumos</h1>
                     <div style={{display:"flex", flexWrap:"wrap", gap:"10px", justifyContent:"space-evenly"}}>
                         {resumos

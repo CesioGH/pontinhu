@@ -69,16 +69,16 @@ export default function CardResumo ({ resumo, isDescriptionOpen, onToggleDescrip
   const isBought = boughtResumes.includes(resumo.nome);
 
    return (
-    <div className={styles.card} style={isBought ? { backgroundColor: 'green' } : null}>
+    <div className={styles.card} >
       <img className={styles.thumbnail} src={resumo.thumbnail} alt={resumo.nome} />
 
       <>
         <h3>{resumo.nome}</h3>
         <h3>{resumo.assunto}</h3>
 
-        <div style={{display:"flex", gap:"3px"}}>
-          <p>R${resumo.valor}</p>
-          {isBought ? <h3 style={{color:"white"}}>Comprado</h3> : <button onClick={handleClick}>Comprar</button>}
+        <div style={{display:"flex", alignItems:"center", gap:"3px", justifyContent:"space-between"}}>
+          <p className={styles.preco}>R${resumo.valor}</p>
+          {isBought ? <h3 className={styles.comprado}>Comprado</h3> : <button onClick={handleClick}>Comprar</button>}
         </div>
 
         <div onClick={onToggleDescription} className={styles['dropdown-container']}>
