@@ -1,130 +1,180 @@
-import React, { useState, useEffect } from 'react';
 import { doc, onSnapshot, getDoc } from 'firebase/firestore';
 import { db } from '../src/lib/firebase';
 import { useUserAuth } from '../src/contexts/UserAuthContext';
 import HeaderUsuario from "/src/components/HeaderUsuario";
 import { UserAuthProvider } from '../src/contexts/UserAuthContext';
 import { useRouter } from 'next/router';
-import styles from '../styles/MeusResumos.module.css';
+import { Card, Popover, CardContent, CardMedia, Typography, Button, Box } from '@mui/material';
+import Fuse from 'fuse.js';
+import { useState, useEffect } from 'react';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 
-const MeusResumos = () => {
-  const { currentUser } = useUserAuth();
-  const [boughtResumes, setBoughtResumes] = useState([]);
-  const [pdfSrc, setPdfSrc] = useState(null);
-  const [openDescriptionIndex, setOpenDescriptionIndex] = useState(null);
-  const [activeResume, setActiveResume] = useState(null);
-  const router = useRouter();
-  const [searchTerm, setSearchTerm] = useState("");
+const darkTheme = createTheme({
+    palette: {
+      mode: 'dark',
+    },
+  });
+  
+  const lightTheme = createTheme({
+    palette: {
+      mode: 'light',
+    },
+  });
 
-  const handleSearchChange = (event) => {
-    setSearchTerm(event.target.value);
-  };
-  const sanitizeId = (id) => {
-    return id
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/ç/g, "c")
-      .replace(/ /g, "-")
-      .toLowerCase();
-  };
+const MeusResumos = (props) => {
+    const { currentUser } = useUserAuth();
+    const [boughtResumes, setBoughtResumes] = useState([]);
+    const [pdfSrc, setPdfSrc] = useState(null);
+    const [activeResume, setActiveResume] = useState(null);
+    const router = useRouter();
+    const [searchTerm, setSearchTerm] = useState("");
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [showPDF, setShowPDF] = useState(false);
+    const [darkMode, setDarkMode] = useState(false);
 
-  useEffect(() => {
-    if (!currentUser) {
-      router.push('/Geral');
-    } else {
-      const userRef = doc(db, "usuarios", currentUser.email);
-      const unsubscribe = onSnapshot(userRef, async (userDoc) => {
-        if (userDoc.exists()) {
-          const resumosComprados = userDoc.data().resumosComprados;
-          const resumoDocs = await Promise.all(resumosComprados.map(nomeResumo => getDoc(doc(db, "resumos", sanitizeId(nomeResumo)))));
-          const resumoData = resumoDocs.map((resumoDocSnapshot, index) => resumoDocSnapshot.exists() ? resumoDocSnapshot.data() : `Resumo não encontrado com o nome ${resumosComprados[index]}`);
-          setBoughtResumes(resumoData);
+    const toggleDarkMode = () => {
+      setDarkMode(prevMode => !prevMode);
+    };
+
+    const open = Boolean(anchorEl);
+
+    const handleClick = (event, resumo) => {
+        if (activeResume === resumo) {
+            setActiveResume(null);
+            setAnchorEl(null);
+        } else {
+            setActiveResume(resumo);
+            setAnchorEl(event.currentTarget);
         }
-      });
+    };
 
-      return () => unsubscribe();
-    }
-  }, [currentUser]);
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
 
-  const toggleDescription = (index) => {
-    if (index === openDescriptionIndex) {
-      setOpenDescriptionIndex(null);
-    } else {
-      setOpenDescriptionIndex(index);
-    }
-  };
+    const handleSearchChange = (event) => {
+        setSearchTerm(event.target.value);
+    };
 
-  return (
-    <UserAuthProvider>
-      <div className={styles.meusResumosContainer}>
-      <HeaderUsuario search={searchTerm} setSearch={setSearchTerm} />
+    const sanitizeId = (id) => {
+        return id
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/ç/g, "c")
+            .replace(/ /g, "-")
+            .toLowerCase();
+    };
 
-        <h1>Meus Resumos</h1>
-        
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "5px", justifyContent: "center", alignItems: "center" }}>
-          <div style={{ display: "flex", flexDirection: "row", gap: "10px", flexWrap: "wrap", justifyContent:"space-evenly" }}>
-            {activeResume ? (
-              <div className={styles.cardMeuResumo}>
-                <img className={styles.thumbFit} src={activeResume.thumbnail} alt="thumbnail" />
-                <p>{activeResume.nome}</p>
-                <p>{activeResume.assunto}</p>
-                <div className={styles['dropdown-container']} onClick={() => toggleDescription(activeResume)}>
-                  <div className={`${styles.dropdown} ${openDescriptionIndex === activeResume ? styles['dropdown-show'] : ''}`}>{activeResume.descricao}</div>
-                  <p>Descrição</p>
-                  <button onClick={() => {
-                    setPdfSrc(activeResume.pdf);
-                    setActiveResume(null);
-                  }}>Ver PDF</button>
-                </div>
-              </div>
-            ) : (
-              boughtResumes
-                .filter((resumo) => {
-                  if (resumo) {
-                    const name = resumo.nome.toLowerCase();
-                    const subject = resumo.assunto.toLowerCase();
-                    const description = resumo.descricao.toLowerCase();
-                    const term = searchTerm.toLowerCase();
-  
-                    return name.includes(term) || subject.includes(term) || description.includes(term);
-                  }
-                  return false;
-                })
-                .map((resumo, index) => {
-                  return resumo ? (
-                    <div className={styles.cardMeuResumo}  key={index}>
-                      <img className={styles.thumbFit} src={resumo.thumbnail} alt="thumbnail" />
-                      <p>{resumo.nome}</p>
-                      <p>{resumo.assunto}</p>
-                      <div className={styles['dropdown-container']} onClick={() => toggleDescription(index)}>
-                        <div className={`${styles.dropdown} ${openDescriptionIndex === index ? styles['dropdown-show'] : ''}`}>{resumo.descricao}</div>
-                        <p>Descrição</p>
-                        <button onClick={() => {
-                          setPdfSrc(resumo.pdf);
-                          setActiveResume(resumo);
-                        }}>Ver PDF</button>
-                      </div>
-                    </div>
-                  ) : (
-                    <div key={index}>
-                      <p>Carregando...</p>
-                    </div>
-                  );
-                })
-            )}
-          </div>
-          {activeResume && <button className={styles.meusOutrosButton} onClick={() => setActiveResume(null)}>Ver meus outros resumos</button>}
-        </div>
-        <br />
-        {pdfSrc && (
-          <div style={{ width: '100%', height: '100vh' }}>
-            <iframe src={pdfSrc} width="100%" height="100%" style={{ border: 'none' }}></iframe>
-          </div>
+    useEffect(() => {
+        if (!currentUser) {
+            router.push('/Geral');
+        } else {
+            const userRef = doc(db, "usuarios", currentUser.email);
+            const unsubscribe = onSnapshot(userRef, async (userDoc) => {
+                if (userDoc.exists()) {
+                    const resumosComprados = userDoc.data().resumosComprados;
+                    const resumoDocs = await Promise.all(resumosComprados.map(nomeResumo => getDoc(doc(db, "resumos", sanitizeId(nomeResumo)))));
+                    const resumoData = resumoDocs.map((resumoDocSnapshot, index) => resumoDocSnapshot.exists() ? resumoDocSnapshot.data() : `Resumo não encontrado com o nome ${resumosComprados[index]}`);
+                    setBoughtResumes(resumoData);
+                }
+            });
+            return () => unsubscribe();
+        }
+    }, [currentUser]);
+
+    const options = {
+        keys: ['nome', 'assunto', 'descricao'],
+        threshold: 0.3
+    };
+    const fuse = new Fuse(boughtResumes, options);
+    const filteredResumes = searchTerm ? fuse.search(searchTerm).map(result => result.item) : boughtResumes;
+
+    return (
+      <UserAuthProvider>
+          <Box>
+                        <HeaderUsuario 
+                    search={searchTerm} 
+                    setSearch={setSearchTerm} 
+                    toggleDarkMode={props.toggleDarkMode} 
+                    darkMode={props.darkMode} 
+                />
+              <Typography variant="h3" align="center" gutterBottom>
+                  Meus Resumos
+              </Typography>
+              {showPDF ? (
+                  <>
+                  <Button size="large" onClick={() => setShowPDF(false)}>
+                          Ver meus outros resumos
+                      </Button>
+                      <Box width="100%" height="100vh">
+                          <iframe src={pdfSrc} width="100%" height="100%" style={{ border: 'none' }}></iframe>
+                      </Box>
+                      <Button size="large" onClick={() => setShowPDF(false)}>
+                          Ver meus outros resumos
+                      </Button>
+                      
+                  </>
+              ) : (
+                  <>
+                      <Box display="flex" flexWrap="wrap" gap={2} justifyContent="center">
+                          {filteredResumes.length === 0 ? (
+                              <Typography>Você não possui nenhum Resumo sobre isso...</Typography>
+                          ) : (
+                              filteredResumes.map((resumo, index) => (
+                                  <div key={index}>
+                                      <Card sx={{ maxWidth: 345, m: 1, boxShadow: 3, '&:hover': { transform: 'scale(1.02)' } }}>
+                                           <CardMedia
+                                        component="img"
+                                        height="140"
+                                        image={resumo.thumbnail}
+                                        alt="thumbnail"
+                                        sx={{ objectFit: 'cover' }}
+                                    />
+                                    <CardContent>
+                                        <Typography gutterBottom variant="h5" component="div">
+                                            {resumo.nome}
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            {resumo.assunto}
+                                        </Typography>
+                                        <Button size="small" onClick={(event) => handleClick(event, resumo)}>
+                                            Descrição
+                                        </Button>
+                                        <Button size="small" onClick={() => {
+                                            setPdfSrc(resumo.pdf);
+                                            setActiveResume(resumo);
+                                            setShowPDF(true);
+                                        }}>
+                                            Ver PDF
+                                        </Button>
+
+                                    </CardContent>
+                                    </Card>
+                                </div>
+                            ))
+                        )}
+                    </Box>
+                    <Popover
+                    open={open}
+                    anchorEl={anchorEl}
+                    onClose={handleClose}
+                    anchorOrigin={{
+                        vertical: 'top',
+                        horizontal: 'center',
+                    }}
+                    transformOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'center',
+                    }}
+                    >
+                    <Typography style={{ padding: '10px', backgroundColor: 'white' }}>{activeResume?.descricao}</Typography>
+                </Popover>
+            </>
         )}
-      </div>
-    </UserAuthProvider>
-  )
-  
+    </Box>
+</UserAuthProvider>
+);
+
 }
 
 export default MeusResumos;
