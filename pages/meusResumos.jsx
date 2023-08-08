@@ -12,14 +12,20 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 const darkTheme = createTheme({
     palette: {
       mode: 'dark',
+      background: {
+        default: "#333"  
+      }
     },
-  });
-  
-  const lightTheme = createTheme({
+});
+
+const lightTheme = createTheme({
     palette: {
       mode: 'light',
+      background: {
+        default: "#f5f5f5"  
+      }
     },
-  });
+});
 
 const MeusResumos = (props) => {
     const { currentUser } = useUserAuth();
@@ -30,7 +36,11 @@ const MeusResumos = (props) => {
     const [searchTerm, setSearchTerm] = useState("");
     const [anchorEl, setAnchorEl] = useState(null);
     const [showPDF, setShowPDF] = useState(false);
-    const [darkMode, setDarkMode] = useState(false);
+    const { darkMode, setDarkMode } = useUserAuth();
+
+    useEffect(() => {
+        document.body.style.backgroundColor = darkMode ? darkTheme.palette.background.default : lightTheme.palette.background.default;
+    }, [darkMode]);
 
     const toggleDarkMode = () => {
       setDarkMode(prevMode => !prevMode);
@@ -90,15 +100,16 @@ const MeusResumos = (props) => {
     const filteredResumes = searchTerm ? fuse.search(searchTerm).map(result => result.item) : boughtResumes;
 
     return (
-      <UserAuthProvider>
-          <Box>
-                        <HeaderUsuario 
-                    search={searchTerm} 
-                    setSearch={setSearchTerm} 
-                    toggleDarkMode={props.toggleDarkMode} 
-                    darkMode={props.darkMode} 
-                />
-              <Typography variant="h3" align="center" gutterBottom>
+        <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
+          <UserAuthProvider>
+            <Box>
+              <HeaderUsuario 
+                search={searchTerm} 
+                setSearch={setSearchTerm} 
+                toggleDarkMode={toggleDarkMode}  
+                darkMode={darkMode}  
+              />
+              <Typography style={{color: darkMode ? "#f5f5f5" : "#000"}} variant="h3" align="center" gutterBottom>
                   Meus Resumos
               </Typography>
               {showPDF ? (
@@ -112,7 +123,6 @@ const MeusResumos = (props) => {
                       <Button size="large" onClick={() => setShowPDF(false)}>
                           Ver meus outros resumos
                       </Button>
-                      
                   </>
               ) : (
                   <>
@@ -155,24 +165,27 @@ const MeusResumos = (props) => {
                         )}
                     </Box>
                     <Popover
-                    open={open}
-                    anchorEl={anchorEl}
-                    onClose={handleClose}
-                    anchorOrigin={{
-                        vertical: 'top',
-                        horizontal: 'center',
-                    }}
-                    transformOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'center',
-                    }}
-                    >
-                    <Typography style={{ padding: '10px', backgroundColor: 'white' }}>{activeResume?.descricao}</Typography>
-                </Popover>
+            open={open}
+            anchorEl={anchorEl}
+            onClose={handleClose}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'center',
+            }}
+            transformOrigin={{
+              vertical: 'bottom',
+              horizontal: 'center',
+            }}
+          >
+            <Typography style={{ padding: '10px', backgroundColor: darkMode ? '#333' : 'white', color: darkMode ? '#f5f5f5' : 'black' }}>
+              {activeResume?.descricao}
+            </Typography>
+          </Popover>
             </>
         )}
     </Box>
 </UserAuthProvider>
+</ThemeProvider>
 );
 
 }

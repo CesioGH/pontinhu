@@ -7,7 +7,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 import firebase from 'firebase/compat/app';
 
-export default function CardResumo ({ resumo, isDescriptionOpen, onToggleDescription }) {
+export default function CardResumo ({ resumo, isDescriptionOpen, onToggleDescription, darkMode  }) {
   const [step, setStep] = useState(0);
   const { currentUser } = useAuth();
   const [orderId, setOrderId] = useState(null);
@@ -75,8 +75,7 @@ export default function CardResumo ({ resumo, isDescriptionOpen, onToggleDescrip
   const isBought = boughtResumes.includes(resumo.nome);
 
   return (
-    <div className={styles.card} >
-      {isLoading ? (
+<div className={`${styles.card} ${darkMode ? styles['card-dark'] : styles['card-light']}`} >      {isLoading ? (
         <CircularProgress  />
       ) : (
         <>
@@ -90,10 +89,20 @@ export default function CardResumo ({ resumo, isDescriptionOpen, onToggleDescrip
             {isBought ? <h3 className={styles.comprado}>Comprado</h3> : <button onClick={handleClick}>Comprar</button>}
           </div>
   
-          <div onClick={onToggleDescription} className={styles['dropdown-container']}>
-            <p>Ver Descrição</p>
-            {isDescriptionOpen && <div className={`${styles.dropdown} ${isDescriptionOpen ? styles['dropdown-open'] : ''}`}>{resumo.descricao}</div>}
-          </div>
+          <div 
+    onClick={onToggleDescription} 
+    className={`${styles['dropdown-container']}`}
+>
+    <p>Ver Descrição</p>
+    <div 
+        className={`${styles.dropdown} 
+        ${isDescriptionOpen ? styles['dropdown-open'] : ''} 
+        ${darkMode ? styles['dropdown-dark'] : ''}`} 
+    >
+        {resumo.descricao}
+    </div>
+</div>
+
         </>
       )}
     </div>

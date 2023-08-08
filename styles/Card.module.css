@@ -139,3 +139,18 @@
    }
 }
 
+
+.card-light {
+  background-color: #ffffff; /* Ou qualquer outra cor que você queira para o modo claro */
+}
+
+.card-dark {
+  background-color: #333; /* Esta é a cor de fundo do card em modo escuro */
+  color: #fff; /* Esta é a cor do texto em modo escuro */
+}
+
+/* Estilo para a descrição em modo escuro */
+.dropdown-dark {
+  background-color: grey; /* Cor de fundo um pouco mais clara que o card */
+  color: #eee; /* Cor de texto para descrição em modo escuro */
+}
