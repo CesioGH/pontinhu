@@ -103,12 +103,14 @@ const MeusResumos = (props) => {
         <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
           <UserAuthProvider>
             <Box>
-              <HeaderUsuario 
+            <HeaderUsuario 
                 search={searchTerm} 
                 setSearch={setSearchTerm} 
-                toggleDarkMode={toggleDarkMode}  
-                darkMode={darkMode}  
-              />
+                toggleDarkMode={toggleDarkMode} 
+                darkMode={darkMode}
+                dataList={boughtResumes}
+            />
+
               <Typography style={{color: darkMode ? "#f5f5f5" : "#000"}} variant="h3" align="center" gutterBottom>
                   Meus Resumos
               </Typography>
@@ -128,7 +130,7 @@ const MeusResumos = (props) => {
                   <>
                       <Box display="flex" flexWrap="wrap" gap={2} justifyContent="center">
                           {filteredResumes.length === 0 ? (
-                              <Typography>Você não possui nenhum Resumo sobre isso...</Typography>
+                              <Typography style={{color:"GrayText"}}>Você não possui nenhum Resumo sobre isso...</Typography>
                           ) : (
                               filteredResumes.map((resumo, index) => (
                                   <div key={index}>

@@ -64,12 +64,18 @@ export default function Geral(){
         return (
             <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
              <div>
-                 <HeaderUsuario search={search} setSearch={setSearch} darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+                 <HeaderUsuario 
+                    search={search} 
+                    setSearch={setSearch} 
+                    darkMode={darkMode} 
+                    toggleDarkMode={toggleDarkMode} 
+                    dataList={resumos}
+                 />
                  <div> 
-                     <h1>Resumos</h1>
+                     <h1 style={{color:"GrayText"}}>Resumos</h1>
                      <div style={{display:"flex", flexWrap:"wrap", gap:"10px", justifyContent:"space-evenly"}}>
                          {results.length === 0 ? 
-                             <div>Nenhum Resumo encontrado com esses termos...</div> : 
+                             <div style={{color:"GrayText"}}>Nenhum Resumo encontrado com esses termos...</div> : 
                              results.map(resumo => (
                                  <CardResumo 
                                      key={resumo.id} 

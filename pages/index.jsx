@@ -43,7 +43,7 @@ const HomePage = () => {
     <div>
     <HeaderLandingPage toggleDarkMode={toggleDarkMode} darkMode={darkMode} />
    <div style={{display:"flex",flexDirection:"column", alignItems:"center"}}>
-      <h1>PONTINHOS</h1>
+      <h1 style={{color:"GrayText"}}>PONTINHOS</h1>
       <div style={{display:"flex", flexDirection:"row",gap:"5px"}}>
   
         <Link style={{display: 'flex',

@@ -1,3 +1,4 @@
+import Head from 'next/head';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useState, useEffect } from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -5,7 +6,6 @@ import { AuthProvider } from '../src/contexts/AuthContext';
 import { UserAuthProvider } from '../src/contexts/UserAuthContext';
 
 function MyApp({ Component, pageProps }) {
-  // Puxar o modo escuro do localStorage
   const savedDarkMode = typeof window !== 'undefined' ? localStorage.getItem("darkMode") : null;
   const [darkMode, setDarkMode] = useState(savedDarkMode ? JSON.parse(savedDarkMode) : false);
 
@@ -15,7 +15,6 @@ function MyApp({ Component, pageProps }) {
     },
   });
 
-  // Armazene o modo escuro no localStorage sempre que ele mudar
   useEffect(() => {
     localStorage.setItem("darkMode", JSON.stringify(darkMode));
   }, [darkMode]);
@@ -26,6 +25,9 @@ function MyApp({ Component, pageProps }) {
 
   return (
     <ThemeProvider theme={theme}>
+      <Head>
+        <link rel="shortcut icon" href="/img/favicon.ico" />
+      </Head>
       <CssBaseline />
       <UserAuthProvider>
         <AuthProvider>

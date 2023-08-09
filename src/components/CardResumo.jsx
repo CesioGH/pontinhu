@@ -4,8 +4,20 @@ import { useAuth } from '../../src/contexts/AuthContext'
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../src/lib/firebase'
 import CircularProgress from '@mui/material/CircularProgress';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Link from 'next/link';
+
 
 import firebase from 'firebase/compat/app';
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    background: {
+      default: "#333"  
+    }
+  },
+});
 
 export default function CardResumo ({ resumo, isDescriptionOpen, onToggleDescription, darkMode  }) {
   const [step, setStep] = useState(0);
@@ -39,7 +51,7 @@ export default function CardResumo ({ resumo, isDescriptionOpen, onToggleDescrip
       return;
     }
   
-    setIsLoading(true);  // Ativar a animação de carregamento
+    setIsLoading(true);  
   
     try {
       const response = await fetch('/api/create_order', {
@@ -68,7 +80,7 @@ export default function CardResumo ({ resumo, isDescriptionOpen, onToggleDescrip
       console.error(error);
       alert('Erro ao processar o pedido. Por favor, tente novamente.');
     } finally {
-      setIsLoading(false);  // Desativar a animação de carregamento
+      setIsLoading(false); 
     }
   }
 
@@ -81,19 +93,19 @@ export default function CardResumo ({ resumo, isDescriptionOpen, onToggleDescrip
         <>
           <img className={styles.thumbnail} src={resumo.thumbnail} alt={resumo.nome} />
   
-          <h3>{resumo.nome}</h3>
-          <h3>{resumo.assunto}</h3>
+          <h3 style={{color:"GrayText"}}>{resumo.nome}</h3>
+          <h3 style={{color:"GrayText"}}>{resumo.assunto}</h3>
   
           <div style={{display:"flex", alignItems:"center", gap:"3px", justifyContent:"space-between"}}>
-            <p className={styles.preco}>R${resumo.valor}</p>
-            {isBought ? <h3 className={styles.comprado}>Comprado</h3> : <button onClick={handleClick}>Comprar</button>}
+            <p style={{color:"GrayText"}} className={styles.preco}>R${resumo.valor}</p>
+            {isBought ? <Link href="/meusResumos" passHref> <h3 className={styles.comprado}>Comprado</h3> </Link> : <button onClick={handleClick}>Comprar</button>}
           </div>
   
           <div 
     onClick={onToggleDescription} 
     className={`${styles['dropdown-container']}`}
 >
-    <p>Ver Descrição</p>
+    <p style={{color:"GrayText", borderStyle:"solid", borderColor:"GrayText", padding:"3px", borderRadius:"5px"}}>Ver Descrição</p>
     <div 
         className={`${styles.dropdown} 
         ${isDescriptionOpen ? styles['dropdown-open'] : ''} 
