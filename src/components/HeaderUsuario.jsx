@@ -3,18 +3,40 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useUserAuth } from '../../src/contexts/UserAuthContext';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signOut } from 'firebase/auth';
-import { auth } from "../lib/firebase";
+import { auth } from "../../src/lib/firebase";
 import { nfd } from 'unorm';
 import { Avatar, Button, AppBar, Toolbar, InputBase, Box, Menu, MenuItem, Switch } from '@mui/material';
-import { styled } from '@mui/system';
+import { styled, width } from '@mui/system';
 import SearchIcon from '@mui/icons-material/Search';
 import Image from 'next/image';
 import Fuse from 'fuse.js';
+import { Tooltip } from '@mui/material';
 
 const fuseOptions = {
     includeScore: true,
     keys: ['nome', 'assunto', 'descricao']
 };
+
+const StyledLink = styled(Link)`
+    img {
+        width: 200px;
+        height: auto;
+    }
+
+    @media (max-width: 768px) {
+        img {
+            width: 150px;
+            height: auto;
+        }
+    }
+   
+    @media (max-width: 468px) {
+        img {
+            width: 100px;
+            height: auto;
+        }
+    }
+`;
 
 const sanitizeString = (str) => {
     return nfd(str).replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -64,12 +86,18 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
     opacity: 1,
     backgroundColor: theme.palette.mode === 'dark' ? '#8796A5' : '#aab4be',
     borderRadius: 20 / 2,
-  },}));
+  },
+  '@media (max-width: 425px)': {
+    marginRight: 0,
+},
+}));
 
-const HeaderUsuario = ({ search, setSearch, toggleDarkMode, darkMode, dataList }) => {
+const HeaderUsuario = ({ props, search, setSearch, toggleDarkMode, darkMode, dataList }) => {
     const { currentUser } = useUserAuth();
     const googleProvider = new GoogleAuthProvider();
     const router = useRouter();
+    const [tooltipOpen, setTooltipOpen] = useState(true);
+
 
     const [suggestions, setSuggestions] = useState([]);
     const [anchorEl, setAnchorEl] = useState(null);
@@ -99,18 +127,7 @@ const HeaderUsuario = ({ search, setSearch, toggleDarkMode, darkMode, dataList }
     }, []);
 
     const handleSignIn = async () => {
-        try {
-            await signInWithPopup(auth, googleProvider);
-        } catch (error) {
-            console.error(error);
-            if (error.code === 'auth/popup-blocked') {
-                try {
-                    await signInWithRedirect(auth, googleProvider);
-                } catch (redirectError) {
-                    console.error(redirectError);
-                }
-            }
-        }
+        router.push("/loginPage")
     };
 
     const handleSignOut = async () => {
@@ -135,9 +152,9 @@ const HeaderUsuario = ({ search, setSearch, toggleDarkMode, darkMode, dataList }
     const getPlaceholderText = () => {
         switch (router.pathname) {
             case '/Geral':
-                return '.  Pesquisar ...';
+                return 'Pesquisar ...';
             case '/meusResumos':
-                return '.  Pesquisar ...';
+                return 'Pesquisar ...';
             default:
                 return '';
         }
@@ -148,26 +165,75 @@ const HeaderUsuario = ({ search, setSearch, toggleDarkMode, darkMode, dataList }
     }, [dataList]);
 
     return (
-        <AppBar position="static">
+        <AppBar style={{
+            position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        zIndex: 1000
+        }}>
             <Toolbar>
-                <Link href="/" passHref>
+                <StyledLink href="/" passHref>
                     <Image
                         src="/img/logo1-removebg-preview.png"
-                        width={320}
-                        height={180}
-                        layout="responsive"
+                        width={270}
+                         height={150}
                         alt="Pontinhos"
                     />
-                </Link>
-                <Box sx={{ position: 'relative', ml: 1, width: { xs: '50%', md: '30%' } }}>
-                    <SearchIcon sx={{ position: 'absolute', left: 0, top: '50%', transform: 'translateY(-50%)', ml: 0.5, pointerEvents: 'none' }} />
+                </StyledLink>
+                <Box sx={{ position: 'relative', ml: 1, width: { xs: '60%', md: '30%' } }}>
+                    <SearchIcon 
+                        sx={{ 
+                            position: 'absolute', 
+                            left: 0.5,   // Reduzir o espaçamento à esquerda
+                            top: '50%', 
+                            transform: 'translateY(-50%)', 
+                            width: {
+                                xs: '15px',   
+                                sm: '20px',   
+                                md: '25px',   
+                            },
+                            height: {
+                                xs: '15px',
+                                sm: '20px',
+                                md: '25px',
+                            }
+                        }}
+                    />
+                    <Tooltip title="Pesquise aqui o resumo que procura" open={tooltipOpen} arrow>
                     <InputBase
                         id='sugestao'
+                        onClick={() => setTooltipOpen(false)}
                         placeholder={getPlaceholderText()}
                         value={sanitizeString(search)}
                         onChange={handleSearchChange}
-                        sx={{ pl: 2, pr: 5, color: 'inherit', width: '100%' }}
+                        sx={{ 
+                            pl: 2.5, 
+                            pr: 5, 
+                            color: 'inherit', 
+                            width: '100%',
+                            fontSize: {
+                                xs: '0.8rem',   // Menor fonte para telas extra pequenas
+                                sm: '0.9rem',   // Tamanho de fonte ligeiramente maior para telas pequenas
+                                md: '1rem',     // Fonte padrão para telas médias e superiores
+                            },
+                            '& svg': {         // Isso vai selecionar o ícone dentro do InputBase
+                                width: {
+                                    xs: '15px',   // Tamanho do ícone para telas extra pequenas
+                                    sm: '20px',   // Tamanho do ícone para telas pequenas
+                                    md: '25px',   // Tamanho padrão do ícone para telas médias e superiores
+                                },
+                                height: {
+                                    xs: '15px',
+                                    sm: '20px',
+                                    md: '25px',
+                                }
+                            } 
+                        }}
                     />
+                    
+                    </Tooltip>
+
                     {suggestions.length > 0 && (
                         <Box 
                             sx={{ 
@@ -180,8 +246,10 @@ const HeaderUsuario = ({ search, setSearch, toggleDarkMode, darkMode, dataList }
                                 bgcolor: 'white', 
                                 color: 'black',   
                                 zIndex: 10, 
-                                boxShadow: 3 
-                            }}>
+                                boxShadow: 3 ,                                     
+                            }
+                            }
+                            >
                             {suggestions.map((suggestion, index) => (
                                 <Box 
                                     key={index} 
@@ -200,7 +268,18 @@ const HeaderUsuario = ({ search, setSearch, toggleDarkMode, darkMode, dataList }
                         </Box>
                     )}
                 </Box>
-                <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
+                <Box sx={{ 
+                    ml: 'auto', 
+                    display: 'flex', 
+                    alignItems: 'center',
+                    '@media (max-width: 374px)': {
+                        flexDirection: 'column',  
+                        '& > :first-child': {  
+                            marginBottom: 1, 
+                        },
+                    }
+                }}>
+    
                     <MaterialUISwitch checked={darkMode} onChange={toggleDarkMode} />
                     {currentUser ? (
                         <>
@@ -218,10 +297,15 @@ const HeaderUsuario = ({ search, setSearch, toggleDarkMode, darkMode, dataList }
                                 <MenuItem disabled>
                                     {currentUser.email}
                                 </MenuItem>
-                                <MenuItem onClick={handleClose}>
-                                  
-                                    <Link style={{color:"grey"}} href="/meusResumos">Meus Resumos</Link>
-                                  
+                                <MenuItem style={{display:"flex", flexDirection:"column"}} onClick={handleClose}>
+                                  <Button>
+                                    <Link style={{color: "#D4AF37"}} href="/meusResumos">Meus Resumos</Link>
+                                   </Button>
+                                    
+                                  <Button>
+                                    <Link style={{color:"grey"}} href="/sendMessage">dúvidas/sugestões</Link>
+                                  </Button>
+
                                 </MenuItem>
                                 <MenuItem onClick={handleSignOut}>Logout</MenuItem>
                             </Menu>

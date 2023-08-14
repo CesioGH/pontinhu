@@ -6,6 +6,7 @@ import Footer from "../src/components/Footer"
 import HeaderLandingPage from "../src/components/HeaderLandingPage"
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useUserAuth } from '../src/contexts/UserAuthContext'; // Ajuste o caminho conforme necessário
+import LandingPageHero from '../src/components/LandingPageHero';
 
 const darkTheme = createTheme({
     palette: {
@@ -27,6 +28,21 @@ const lightTheme = createTheme({
 
 const HomePage = () => {
   const { darkMode, setDarkMode } = useUserAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    const h2Element = document.querySelector('h2');
+
+    const h2Color = h2Element ? window.getComputedStyle(h2Element).color : null;
+
+    const bodyBackgroundColor = window.getComputedStyle(document.body).backgroundColor;
+
+    if (h2Color === 'rgba(0, 0, 0, 0.87)' && bodyBackgroundColor === 'rgb(51, 51, 51)') {
+      location.reload();
+    } else if (h2Color === 'rgb(255, 255, 255)' && bodyBackgroundColor === 'rgb(245, 245, 245)') {
+      location.reload();
+    }
+  }, []);
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -40,29 +56,16 @@ const HomePage = () => {
 
   return (
           <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
-    <div>
-    <HeaderLandingPage toggleDarkMode={toggleDarkMode} darkMode={darkMode} />
-   <div style={{display:"flex",flexDirection:"column", alignItems:"center"}}>
-      <h1 style={{color:"GrayText"}}>PONTINHOS</h1>
-      <div style={{display:"flex", flexDirection:"row",gap:"5px"}}>
-  
-        <Link style={{display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width:"100px",height:"100px",
-          borderWidth:"2px",borderStyle:"solid",borderRadius:"3px"}}
-        href="/Geral/">
-          RESUMOS
-        </Link>
-
-        
-
-      </div>
+            <HeaderLandingPage toggleDarkMode={toggleDarkMode} darkMode={darkMode} />
+            <LandingPageHero/>
+   
+    
+   
 
       
 <Footer/>
-    </div>
-    </div>
+    
+    
         </ThemeProvider>
   );
 };

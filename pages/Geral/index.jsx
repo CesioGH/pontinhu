@@ -8,6 +8,9 @@ import Footer from "../../src/components/Footer";
 import Fuse from 'fuse.js';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
+import Slider from '@mui/material/Slider';
+import styles from '../../styles/Card.module.css'
+import Image from 'next/image';
 
 const darkTheme = createTheme({
     palette: {
@@ -29,13 +32,16 @@ const lightTheme = createTheme({
 
 
 
+
 export default function Geral(){
     
     const [resumos, setResumos] = useState([]);
     const [openedCard, setOpenedCard] = useState(null); 
     const [search, setSearch] = useState("");
     const { darkMode, setDarkMode, toggleDarkMode } = useUserAuth();
+    const [cardSize, setCardSize] = useState(90); 
 
+    
     useEffect(() => {
         const fetchResumos = async () => {
             const snapshot = await db.collection('resumos').get();
@@ -61,6 +67,9 @@ export default function Geral(){
         }, [darkMode]);
 
 
+        const cardMinWidth = 200 * (cardSize / 100);
+
+
         return (
             <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
              <div>
@@ -71,22 +80,42 @@ export default function Geral(){
                     toggleDarkMode={toggleDarkMode} 
                     dataList={resumos}
                  />
-                 <div> 
-                     <h1 style={{color:"GrayText"}}>Resumos</h1>
-                     <div style={{display:"flex", flexWrap:"wrap", gap:"10px", justifyContent:"space-evenly"}}>
-                         {results.length === 0 ? 
-                             <div style={{color:"GrayText"}}>Nenhum Resumo encontrado com esses termos...</div> : 
-                             results.map(resumo => (
-                                 <CardResumo 
-                                     key={resumo.id} 
-                                     resumo={resumo}
-                                     isDescriptionOpen={openedCard === resumo.nome} 
-                                     onToggleDescription={() => handleToggleDescription(resumo.nome)} 
-                                     darkMode={darkMode}
-                                 />
-                             ))
-                         }
+                 <div style={{paddingTop:"50px"}} > 
+                     <div>
+                        <h1 style={{color:"GrayText", marginLeft:"10px", color: "#D4AF37"}}>Compre seus Resumos com toda segurança do Mercado Pago </h1>
+                        <h2 style={{color:"GrayText", marginLeft:"10px"}}></h2>
+                        
+                            <label style={{color:"GrayText",marginRight:"10vw",marginLeft:"40vw"}}>Ajuste o tamanho do Card</label>
+                            <Slider
+                                value={cardSize}
+                                onChange={(event, newValue) => setCardSize(newValue)}
+                                aria-labelledby="card-size-slider"
+                                valueLabelDisplay="auto"
+                                step={10}
+                                marks
+                                min={50} // Mínimo de 50% do tamanho original
+                                max={150} // Máximo de 150% do tamanho original
+                            />
                      </div>
+
+                     
+                     <div className={styles.cardContainer} style={{ '--card-min-width': `${cardMinWidth}px` }}>
+                        {results.length === 0 ? 
+                            <div style={{color:"GrayText"}}>Nenhum Resumo encontrado com esses termos...</div> : 
+                            results.map(resumo => (
+                            <CardResumo 
+                                key={resumo.id} 
+                                resumo={resumo}
+                                isDescriptionOpen={openedCard === resumo.nome} 
+                                onToggleDescription={() => handleToggleDescription(resumo.nome)} 
+                                darkMode={darkMode}
+                                cardSize={cardSize}
+                            />
+                            ))
+                        }
+                        </div>
+
+
                  </div>
                  <br />
                  <Footer/>

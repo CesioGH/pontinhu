@@ -24,7 +24,7 @@ const lightTheme = createTheme({
       background: {
         default: "#f5f5f5"  
       }
-    },
+    }, 
 });
 
 const MeusResumos = (props) => {
@@ -102,7 +102,7 @@ const MeusResumos = (props) => {
     return (
         <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
           <UserAuthProvider>
-            <Box>
+            <Box style={{paddingTop:"60px"}}>
             <HeaderUsuario 
                 search={searchTerm} 
                 setSearch={setSearchTerm} 

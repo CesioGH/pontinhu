@@ -145,12 +145,20 @@
 }
 
 .card-dark {
-  background-color: #333; /* Esta é a cor de fundo do card em modo escuro */
+  background-color: #454546; /* Esta é a cor de fundo do card em modo escuro */
   color: #fff; /* Esta é a cor do texto em modo escuro */
 }
 
-/* Estilo para a descrição em modo escuro */
 .dropdown-dark {
   background-color: grey; /* Cor de fundo um pouco mais clara que o card */
   color: #eee; /* Cor de texto para descrição em modo escuro */
 }
+
+.cardContainer {
+  margin-left: 10px;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(var(--card-min-width, 150px), 1fr));
+}
+
+

@@ -46,12 +46,12 @@ export default async (req, res) => {
         ]
        
       },
-      back_urls: { // Definindo a URL de retorno
-        success: 'https://pontinhu-2.vercel.app/Geral', // A URL do seu site onde você deseja que os usuários voltem
+      back_urls: { 
+        success: 'https://pontinhu-2.vercel.app/Geral', 
         pending: 'https://pontinhu-2.vercel.app/Geral',
         failure: 'https://pontinhu-2.vercel.app/Geral',
       },
-      auto_return: 'approved', // Os compradores retornam automaticamente para o "success" URL quando o pagamento for aprovado
+      auto_return: 'approved',
     };
     
 
@@ -70,26 +70,21 @@ export default async (req, res) => {
         external_reference: external_reference,
       };
 
-      // Verificar se o documento com o external_reference correspondente já existe
       const q = query(collection(db, "compras"), where("external_reference", "==", external_reference));
 
       const querySnapshot = await getDocs(q);
       
       if (!querySnapshot.empty) {
-        // Se existir, verificar o status
         for (let doc of querySnapshot.docs) {
           const docData = doc.data();
           if (docData.status === 'confirmed') {
-            // Se o status for 'confirmed', retornar um erro
             res.status(400).send('Você já comprou este produto');
-            return;  // Importante para parar a execução do código aqui
+            return; 
           } else {
-            // Se o status não for 'confirmed', atualizar o documento
             await setDoc(doc.ref, compra, { merge: true });
           }
         }
       } else {
-        // Se não existir, criar o documento
         await addDoc(collection(db, "compras"), compra);
       }
       
@@ -98,14 +93,13 @@ export default async (req, res) => {
       const userSnapshot = await getDoc(userDoc);
 
       if (!userSnapshot.exists()) {
-        // Se não existir, criar o documento do usuário
         await setDoc(userDoc, { email: email, registro: new Date().toISOString(), resumosComprados: [] });
       }
 
       res.status(200).json({ 
         id: payment.body.id, 
         url: payment.body.init_point ,
-        external_reference: preference.external_reference //@@@@@@@@@@
+        external_reference: preference.external_reference 
       });
 
     } catch (error) {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useUserAuth } from '../../src/contexts/UserAuthContext';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, signOut } from 'firebase/auth';
@@ -6,6 +6,38 @@ import { auth } from "../lib/firebase";
 import { Avatar, Button, AppBar, Toolbar, InputBase, Box, Menu, MenuItem, Switch } from '@mui/material';
 import { styled } from '@mui/system';
 import Image from 'next/image';
+import { useRouter } from 'next/router';
+
+const StyledButton = styled(Button)`
+    background-color: #D4AF37;
+    width: 20vw;
+
+    @media (max-width: 768px) {
+        width: 20vw;
+        font-size: 0.75em;
+        padding-bottom: 0;
+        padding-top: 1px;
+        line-height: 1.3;
+    }
+
+    @media (max-width: 321px) {
+    width: 25vw;
+    }
+`;
+
+const StyledLink = styled(Link)`
+    img {
+        width: 200px;
+        height: auto;
+    }
+
+    @media (max-width: 768px) {
+        img {
+            width: 150px;
+            height: auto;
+        }
+    }
+`;
 
 const MaterialUISwitch = styled(Switch)(({ theme }) => ({
   width: 62,
@@ -60,18 +92,24 @@ const HeaderLandingPage = ({ toggleDarkMode, darkMode }) => {
     const [anchorEl, setAnchorEl] = useState(null);
     const open = Boolean(anchorEl);
 
+    const router = useRouter();
+
+  useEffect(() => {
+    const h2Element = document.querySelector('h2');
+
+    const h2Color = h2Element ? window.getComputedStyle(h2Element).color : null;
+
+    const bodyBackgroundColor = window.getComputedStyle(document.body).backgroundColor;
+
+    if (h2Color === 'rgba(0, 0, 0, 0.87)' && bodyBackgroundColor === 'rgb(51, 51, 51)') {
+      location.reload();
+    } else if (h2Color === 'rgb(255, 255, 255)' && bodyBackgroundColor === 'rgb(245, 245, 245)') {
+      location.reload();
+    }
+  }, []);
+
     const handleSignIn = async () => {
-        try {
-            await signInWithPopup(auth, googleProvider);
-        } catch (error) {
-            if (error.code === 'auth/popup-blocked') {
-                try {
-                    await signInWithRedirect(auth, googleProvider);
-                } catch (redirectError) {
-                    console.error(redirectError);
-                }
-            }
-        }
+        router.push("/loginPage")
     };
 
     const handleSignOut = async () => {
@@ -96,15 +134,14 @@ const HeaderLandingPage = ({ toggleDarkMode, darkMode }) => {
     return (
       <AppBar position="static">
           <Toolbar>
-              <Link href="/" passHref>
-                  <Image
-                      src="/img/logo1-removebg-preview.png"
-                      width={270}
-                      height={150}
-                      layout="responsive"
-                      alt="Pontinhos"
-                  />
-              </Link>
+          <StyledLink href="/" passHref>
+          <Image
+                src="/img/logo1-removebg-preview.png"
+                width={270}
+                height={150}
+                alt="Pontinhos"
+            />
+         </StyledLink>
               
               <Box sx={{ ml: 'auto', display: 'flex', alignItems: 'center' }}>
                  
@@ -120,7 +157,9 @@ const HeaderLandingPage = ({ toggleDarkMode, darkMode }) => {
                 }
             `}</style>
             <Link href="/Geral" passHref>
-                <Button color="primary" style={{backgroundColor:"#D4AF37"}} variant="contained">COMPRAR RESUMOS</Button>
+                <StyledButton color="primary" variant="contained">
+                     COMPRAR RESUMOS
+                </StyledButton>
             </Link>
            </>
 
@@ -142,8 +181,9 @@ const HeaderLandingPage = ({ toggleDarkMode, darkMode }) => {
                                   {currentUser.email}
                               </MenuItem>
                               <MenuItem onClick={handleClose}>
-                                  <Link href="/meusResumos">Meus Resumos</Link>
-                              </MenuItem>
+                                    <Button>
+                                     <Link style={{color:"grey"}} href="/meusResumos">Meus Resumos</Link>
+                                    </Button>                              </MenuItem>
                               <MenuItem onClick={handleSignOut}>Logout</MenuItem>
                           </Menu>
                       </>

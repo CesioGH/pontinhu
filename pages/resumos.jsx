@@ -22,7 +22,6 @@ const ResumosPage = () => {
       setResumos(resumosData);
     });
 
-    // cleanup function
     return () => fetchResumos();
   }, []);
 
@@ -36,7 +35,7 @@ const ResumosPage = () => {
 
   if (!currentUser || currentUser.uid !== "lJQm2PbwBFaoFHvOPGkoz3jU5rF3") {
     router.push('/login');
-    return null; // Return null to indicate that no component should be rendered
+    return null; 
   }
 
   const sanitizeId = (id) => {
@@ -64,7 +63,6 @@ const ResumosPage = () => {
 
     const resumoId = sanitizeId(nome);
 
-    // Verificando se já existe um resumo com o mesmo nome
     const existingResumoDoc = doc(db, "resumos", resumoId);
     const existingResumoSnapshot = await getDoc(existingResumoDoc);
 

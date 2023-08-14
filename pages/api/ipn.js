@@ -29,35 +29,27 @@ export default async (req, res) => {
       const { status, external_reference } = payment.body;
 
       if (status === 'approved') {
-        // Separate email and title from external_reference
         const [email, title] = external_reference.split("-");
 
-        // Query to find the document with the corresponding external_reference
         const q = query(collection(db, "compras"), where("external_reference", "==", external_reference));
 
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
-          // Use a for...of loop to properly handle async operations
           for (let doc of querySnapshot.docs) {
-            // Update the document's status to 'confirmed'
             await setDoc(doc.ref, { status: 'confirmed', dataConfirmacaoPagamento: new Date().toISOString() }, { merge: true });          }
         }
 
-        // Find the user's document
         const userQuery = query(collection(db, "usuarios"), where("email", "==", email));
         const userQuerySnapshot = await getDocs(userQuery);
 
         if (!userQuerySnapshot.empty) {
           const userDoc = userQuerySnapshot.docs[0];
           
-          // Get the current resumosComprados or set to an empty array if it doesn't exist
           const currentResumos = userDoc.data().resumosComprados || [];
 
-          // Add the new title to resumosComprados
           currentResumos.push(title);
 
-          // Update the user's document with the new resumosComprados
           await setDoc(userDoc.ref, { resumosComprados: currentResumos }, { merge: true });
 
           console.log(`Updated resumosComprados for user ${email}`);
@@ -65,20 +57,16 @@ export default async (req, res) => {
           console.log(`User document not found for email ${email}`);
         }
 
-        // Find the resumo's document
         const resumoQuery = query(collection(db, "resumos"), where("nome", "==", title));
         const resumoQuerySnapshot = await getDocs(resumoQuery);
 
         if (!resumoQuerySnapshot.empty) {
           const resumoDoc = resumoQuerySnapshot.docs[0];
 
-          // Get the current compradores or set to an empty array if it doesn't exist
           const currentCompradores = resumoDoc.data().compradores || [];
 
-          // Add the new email to compradores
           currentCompradores.push(email);
 
-          // Update the resumo's document with the new compradores
           await setDoc(resumoDoc.ref, { compradores: currentCompradores }, { merge: true });
 
           console.log(`Updated compradores for resumo ${title}`);
