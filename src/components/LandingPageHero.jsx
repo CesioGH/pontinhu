@@ -34,6 +34,21 @@ const LandingPage = () => {
                         <Typography variant="h5" gutterBottom>
                             Estude por resumos focados! Específicos das matérias que vão cair na sua prova amanhã!
                         </Typography>
+                        
+                        <div style={{ display: 'flex', justifyContent: 'center', width: '100%', marginTop: '20px' }}> {/* Adicionado estilo flex */}
+                            <Link href="/Geral" passHref>
+                                <StyledButton color="primary" variant="contained">
+                                    COMPRAR RESUMOS
+                                </StyledButton>
+                            </Link>
+                        </div>
+                        <hr />
+                        <Typography style={{ color: "#D4AF37" }} variant="h2" gutterBottom>
+                            Sem burocracia
+                        </Typography>
+                        <Typography variant="h5" gutterBottom>
+                            Faça login em segundos, pesquise pelo assunto que deseja estudar, pague com PIX e leia seu PDF. Simples assim.
+                        </Typography>
                         <div style={{ display: 'flex', justifyContent: 'center', width: '100%', marginTop: '20px' }}> {/* Adicionado estilo flex */}
                             <Link href="/Geral" passHref>
                                 <StyledButton color="primary" variant="contained">

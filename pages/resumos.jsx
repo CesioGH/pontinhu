@@ -5,7 +5,7 @@ import { db, storage } from '../src/lib/firebase'
 import ResumosComApagar from '../src/components/ResumosComApagar';
 import { v4 as uuidv4 } from 'uuid';
 import HeaderAdm from "../src/components/HeaderAdm"
-import { doc, getDoc, getFirestore } from "firebase/firestore";
+import { doc, getDoc, getFirestore, collection, getDocs } from "firebase/firestore";
 
 const ResumosPage = () => {
   const { currentUser } = useAuth();
@@ -32,11 +32,33 @@ const ResumosPage = () => {
   const [descricao, setDescricao] = useState("");
   const [thumbnail, setThumbnail] = useState(null);
   const [pdf, setPdf] = useState(null);
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
 
-  if (!currentUser || currentUser.uid !== "lJQm2PbwBFaoFHvOPGkoz3jU5rF3") {
-    router.push('/login');
-    return null; 
-  }
+
+  useEffect(() => {
+    if (!currentUser || currentUser.uid !== "lJQm2PbwBFaoFHvOPGkoz3jU5rF3") {
+      router.push('/');
+    }
+  }, [currentUser, router]);
+  
+
+  useEffect(() => {
+    const fetchUnreadMessagesCount = async () => {
+      const db = getFirestore();
+      const querySnapshot = await getDocs(collection(db, 'messages'));
+      const msgs = querySnapshot.docs.map(doc => doc.data());
+
+      let count = 0;
+      msgs.forEach(msg => {
+        if (!msg.adminResponse) count++;
+      });
+
+      setUnreadMessagesCount(count);
+    };
+
+    fetchUnreadMessagesCount();
+  }, []);
+
 
   const sanitizeId = (id) => {
     return id
@@ -95,12 +117,12 @@ const ResumosPage = () => {
 
 
   return (
-    <div>
-      <HeaderAdm />
+    <div >
+      <HeaderAdm unreadCount={unreadMessagesCount} />
 
-      <h1>Cadastro dos resumos:</h1>
+      <h1 style={{marginLeft:"3px", color:"grey"}}>Cadastro dos resumos:</h1>
 
-      <form onSubmit={handleResumoSubmit}>
+      <form style={{marginLeft:"3px", color:"grey"}} onSubmit={handleResumoSubmit}>
         <label>
           Nome:
           <input type="text" value={nome} onChange={(e) => setNome(e.target.value)} required />

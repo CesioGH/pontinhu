@@ -12,7 +12,7 @@ const StyledButton = styled(Button)`
     background-color: #D4AF37;
     width: 20vw;
 
-    @media (max-width: 768px) {
+    @media (max-width: 768px) { 
         width: 20vw;
         font-size: 0.75em;
         padding-bottom: 0;
@@ -173,19 +173,25 @@ const HeaderLandingPage = ({ toggleDarkMode, darkMode }) => {
                               onClick={handleMenu}
                           />
                           <Menu
-                              anchorEl={anchorEl}
-                              open={open}
-                              onClose={handleClose}
-                          >
-                              <MenuItem disabled>
-                                  {currentUser.email}
-                              </MenuItem>
-                              <MenuItem onClick={handleClose}>
-                                    <Button>
-                                     <Link style={{color:"grey"}} href="/meusResumos">Meus Resumos</Link>
-                                    </Button>                              </MenuItem>
-                              <MenuItem onClick={handleSignOut}>Logout</MenuItem>
-                          </Menu>
+                                anchorEl={anchorEl}
+                                open={open}
+                                onClose={handleClose}
+                            >
+                                <MenuItem disabled>
+                                    {currentUser.email}
+                                </MenuItem>
+                                <MenuItem style={{display:"flex", flexDirection:"column"}} onClick={handleClose}>
+                                  <Button>
+                                    <Link style={{color: "#D4AF37"}} href="/meusResumos">Meus Resumos</Link>
+                                   </Button>
+                                    
+                                  <Button>
+                                    <Link style={{color:"grey"}} href="/sendMessage">dúvidas/sugestões</Link>
+                                  </Button>
+
+                                </MenuItem>
+                                <MenuItem onClick={handleSignOut}>Logout</MenuItem>
+                            </Menu>
                       </>
                   ) : (
                       <Button color="inherit" onClick={handleSignIn}>Log in</Button>

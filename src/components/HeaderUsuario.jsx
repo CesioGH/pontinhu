@@ -13,7 +13,7 @@ import Fuse from 'fuse.js';
 import { Tooltip } from '@mui/material';
 
 const fuseOptions = {
-    includeScore: true,
+    includeScore: true, 
     keys: ['nome', 'assunto', 'descricao']
 };
 

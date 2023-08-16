@@ -4,7 +4,7 @@ import { getApps, getApp } from 'firebase/app';
 import mercadopago from 'mercadopago';
 
 mercadopago.configure({
-  access_token: 'APP_USR-2959072667236669-061614-31f611d4824cfebfa39cc73bb2378dff-245719485'
+  access_token: 'APP_USR-7064583763861576-081514-dc282a00528f9dd4bf748edabb8d7085-157955641'
 });
 
 const firebaseConfig = {
