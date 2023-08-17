@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import styled from 'styled-components';
 import { Button, TextField, Container, Typography, Grid } from '@mui/material';
-import Image from "next/image"
+import Image from "next/image";
+import InstagramIcon from '@mui/icons-material/Instagram';
 
 const FooterContainer = styled.div`
   position: fixed;
@@ -21,28 +22,35 @@ const FooterContainer = styled.div`
   }
 `;
 
-const FooterLink = styled.p`
-  color: #333;
+const StyledLink = styled.a`
+  text-decoration: none;
+  color: white;
 
-  &:hover {
-    color: #555;
+  &:hover, &:visited, &:active {
+    color: white;
+    text-decoration: none;
   }
 `;
 
 const Footer = () => {
   return (
     <FooterContainer>
-      <div>@Pontinho´s</div>
-      <div style={{backgroundColor: "white", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center"}}>
+      <StyledLink href="https://instagram.com/pontinhosresumos?igshid=NjIwNzIyMDk2Mg==" target="_blank" rel="noopener noreferrer">
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <InstagramIcon style={{ marginRight: "5px" }} />
+          @pontinhosresumos
+        </div>
+      </StyledLink>
+      <div style={{ backgroundColor: "white", borderRadius: "10px", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <img
           src="/img/mercado-pago.svg"
           alt="Logo Mercado Pago"
-          style={{width: "70px", height: "auto", borderRadius: "10px", marginRight:"5px",marginTop:"1px" ,marginLeft:"3px"}}
+          style={{ width: "70px", height: "auto", borderRadius: "10px", marginRight: "5px", marginTop: "1px", marginLeft: "3px" }}
         />
       </div>
       <div>
         <Link href="/login">
-          <Button style={{height: "1px", color: "#333"}}>
+          <Button style={{ height: "1px", color: "#333" }}>
             Login
           </Button>
         </Link>
@@ -50,6 +58,5 @@ const Footer = () => {
     </FooterContainer>
   );
 }
-
 
 export default Footer;

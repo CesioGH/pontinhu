@@ -5,7 +5,27 @@ import { Box, Button, TextField, Typography, Paper, List, ListItem, ListItemText
 import { getDocs, collection, getFirestore, setDoc, doc } from "firebase/firestore";
 import { useAuth } from '../src/contexts/AuthContext';
 import { useRouter } from 'next/router';
-import HeaderAdm from "../src/components/HeaderAdm"
+import HeaderAdm from "../src/components/HeaderAdm" 
+import { useUserAuth } from '../src/contexts/UserAuthContext'
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+const darkTheme = createTheme({
+  palette: {
+    mode: 'dark',
+    background: {
+      default: "#333"
+    }
+  },
+});
+
+const lightTheme = createTheme({
+  palette: {
+    mode: 'light',
+    background: {
+      default: "#f5f5f5"
+    }
+  },
+});
 
 const AdminDashboard = () => {
   const [messages, setMessages] = useState([]);
@@ -14,6 +34,11 @@ const AdminDashboard = () => {
   const { currentUser } = useAuth();
   const [counters, setCounters] = useState({ orange: 0, red: 0 });
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
+  const { darkMode, setDarkMode , toggleDarkMode} = useUserAuth();
+
+  useEffect(() => {
+      document.body.style.backgroundColor = darkMode ? darkTheme.palette.background.default : lightTheme.palette.background.default;
+  }, [darkMode]);
 
   useEffect(() => {
     const fetchUnreadMessagesCount = async () => {
@@ -128,7 +153,7 @@ const AdminDashboard = () => {
             <HeaderAdm unreadCount={unreadMessagesCount} />
     <Box p={4}>
       <div style={{display:"flex", flexDirection:"column"}}>
-      <Typography variant="h4" gutterBottom>Mensagens dos usuários</Typography>
+      <Typography variant="h4" style={{color:"grey"}} gutterBottom>Mensagens dos usuários</Typography>
       <Typography style={{display:"flex", flexDirection:"column"}} variant="h8" gutterBottom>
         <span style={{ marginLeft: '2px', color: 'orange' }}>Pendentes: {counters.orange}</span>
         <span style={{ marginLeft: '2px', color: 'red' }}> +24h: {counters.red}</span>
@@ -152,18 +177,28 @@ const AdminDashboard = () => {
       </Paper>
 
       {selectedMessage && (
-        <Box style={{width: '45%', float: 'right'}}>
+        <Box style={{width: '45%', float: 'right', color:"grey"}}>
           <Typography variant="h6">Responda para: {selectedMessage.userEmail} :</Typography>
           <Typography style={{borderStyle:"solid", borderRadius:"10px", borderWidth:"1px", padding:"4px",margin:"1px"}} gutterBottom>{selectedMessage.content}</Typography>
 
-          <form onSubmit={handleSendResponse}>
-            <TextField 
+          <form style={{color:"grey"}} onSubmit={handleSendResponse}>
+          <TextField 
+              style={{marginTop: 20}}
               fullWidth 
-              variant="outlined" 
-              label="Sua resposta" 
+              variant="outlined"
+              InputLabelProps={{ style: { color: 'grey' } }}  // Altera a cor do label
+              InputProps={{                                     // Altera a cor do input
+                style: {
+                  borderStyle:"solid",
+                  borderRight:"0px",
+                  borderTop:"0px",
+                  borderColor:"grey",
+                  color: 'grey',
+                },
+              }}
+              label="Sua resposta"
               value={response}
               onChange={(e) => setResponse(e.target.value)}
-              style={{marginTop: 20}}
             />
             <Button variant="contained" color="primary" type="submit" style={{marginTop: 10}}>Enviar Resposta</Button>
           </form>
